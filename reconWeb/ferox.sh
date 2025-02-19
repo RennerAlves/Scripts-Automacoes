@@ -16,4 +16,4 @@ fi
 host=$1
 
 echo "Iniciando o scan com Feroxbuster em: $host"
-feroxbuster -u "$host" -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt -x .txt,.pdf,.zip,.bkp,.bak,.doc,.xls --random-agent
+feroxbuster -u "$host" -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt -x .txt,.pdf,.zip,.bkp,.bak,.doc,.xls --random-agent -k

@@ -16,4 +16,4 @@ fi
 host=$1
 
 echo "Iniciando o scan com Gobuster em: $host"
-gobuster dir -u $host -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt -x .txt,.pdf,.zip,.bkp,.bak,.doc,.xls,.php --random-agent -t 100
+gobuster dir -u $host -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt -x .txt,.pdf,.zip,.bkp,.bak,.doc,.xls,.php --random-agent -t 100 -k
