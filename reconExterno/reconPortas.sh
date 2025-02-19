@@ -10,7 +10,6 @@ exibir_ajuda() {
 
 # Função para realizar o escaneamento das top 1000 portas
 escanear_top_1000_portas() {
-    local ip="$1"
     mkdir -p "/tmp/$ip"
     echo ""
     echo "Scanning - Top 1000 portas"
@@ -20,7 +19,6 @@ escanear_top_1000_portas() {
 
 # Função para realizar o escaneamento de todas as portas
 escanear_todas_as_portas() {
-    local ip="$1"
     echo ""
     echo "Scanning - Todas as portas"
     nmap -v -sS --open -g 53 -p- -Pn "$ip" | grep -E "open" | grep -v "Discovered" | cut -d '/' -f 1 > "/tmp/$ip/ReconTodasPortas.txt"
@@ -29,7 +27,6 @@ escanear_todas_as_portas() {
 
 # Função para realizar a análise detalhada das portas descobertas
 analise_detalhada() {
-    local ip="$1"
     local portas=$(tr '\n' ',' < "/tmp/$ip/ReconTodasPortas.txt" | sed 's/,$//')
     echo ""
     echo "Scanning - Análise detalhada"
