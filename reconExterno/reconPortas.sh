@@ -1,45 +1,60 @@
 #!/bin/bash
 
-if [ "$1" == "" ]
-then
+# Função para exibir mensagem de ajuda
+exibir_ajuda() {
     echo "Script de Recon inicial de portas"
     echo "Modo de usar o script: $0 192.168.0.1"
     echo "Modo de usar o script: $0 192.168.0.0/24"
     exit 1
-else
-    ip=$1
-    mkdir /tmp/$ip
+}
+
+# Função para realizar o escaneamento das top 1000 portas
+escanear_top_1000_portas() {
+    local ip="$1"
+    mkdir -p "/tmp/$ip"
     echo ""
     echo "Scanning - Top 1000 portas"
-    nmap -v -sS --open -g 53 -Pn $ip | grep -E "open" | grep -v "Discovered" | cut -d '/' -f 1 > /tmp/$ip/Recon1000Portas.txt
-    echo ""
-    echo "Portas descobertas:"
-    cat /tmp/$ip/Recon1000Portas.txt
-    echo ""
-    echo "-----------"
-    echo "-----------"
-    echo ""
+    nmap -v -sS --open -g 53 -Pn "$ip" | grep -E "open" | grep -v "Discovered" | cut -d '/' -f 1 > "/tmp/$ip/Recon1000Portas.txt"
+    exibir_resultado "/tmp/$ip/Recon1000Portas.txt"
+}
 
+# Função para realizar o escaneamento de todas as portas
+escanear_todas_as_portas() {
+    local ip="$1"
+    echo ""
     echo "Scanning - Todas as portas"
-    nmap -v -sS --open -g 53 -p- -Pn $ip | grep -E "open" | grep -v "Discovered" | cut -d '/' -f 1 > /tmp/$ip/ReconTodasPortas.txt
-    echo ""
-    echo "Portas descobertas:"
-    cat /tmp/$ip/ReconTodasPortas.txt
-    echo ""
-    echo "-----------"
-    echo "-----------"
-    echo ""
+    nmap -v -sS --open -g 53 -p- -Pn "$ip" | grep -E "open" | grep -v "Discovered" | cut -d '/' -f 1 > "/tmp/$ip/ReconTodasPortas.txt"
+    exibir_resultado "/tmp/$ip/ReconTodasPortas.txt"
+}
 
+# Função para realizar a análise detalhada das portas descobertas
+analise_detalhada() {
+    local ip="$1"
+    local portas=$(tr '\n' ',' < "/tmp/$ip/ReconTodasPortas.txt" | sed 's/,$//')
+    echo ""
     echo "Scanning - Análise detalhada"
+    nmap -v -sVC --open -g 53 -p "$portas" -Pn "$ip" > "/tmp/$ip/ReconDetalhadoPortas.txt"
+    exibir_resultado "/tmp/$ip/ReconDetalhadoPortas.txt"
+}
 
-    # Converte as portas do arquivo em uma lista separada por vírgula
-    portas=$(tr '\n' ',' < /tmp/$ip/ReconTodasPortas.txt | sed 's/,$//')
-    nmap -v -sVC --open -g 53 -p $portas -Pn $ip > /tmp/$ip/ReconDetalhadoPortas.txt
+# Função para exibir o resultado de um arquivo
+exibir_resultado() {
+    local arquivo="$1"
     echo ""
-    echo "Resultado da análise detalhada:"
-    cat /tmp/$ip/ReconDetalhadoPortas.txt
+    echo "Resultado:"
+    cat "$arquivo"
     echo ""
     echo "-----------"
     echo "-----------"
     echo ""
+}
+
+# Verifica se o argumento foi passado
+if [ "$1" == "" ]; then
+    exibir_ajuda
+else
+    ip="$1"
+    escanear_top_1000_portas "$ip"
+    escanear_todas_as_portas "$ip"
+    analise_detalhada "$ip"
 fi
